@@ -1,0 +1,92 @@
+USE [C117_sehguhbj_gmail]
+GO
+/****** Object:  StoredProcedure [dbo].[Friends_InsertV2]    Script Date: 8/12/2022 12:09:09 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+ALTER   PROC [dbo].[Friends_InsertV2]
+			@Title nvarchar(50)
+			,@Bio nvarchar(50)
+			,@Summary nvarchar(50)
+			,@Headline nvarchar(50)
+			,@Slug nvarchar(50)
+			,@StatusId int
+			,@TypeId int
+			,@PrimaryImageUrl nvarchar(50)
+			,@UserId int
+			,@Id int OUTPUT
+			
+
+AS
+
+/* ----- TEST CODE -----
+
+	DECLARE @Id int = 1;
+	DECLARE @ImageId int = 1;
+
+	Declare @Title nvarchar(50) = 'David Hughes '
+			,@Bio nvarchar(50) = 'Jr. Software Developer'
+			,@Summary nvarchar(50) = 'Looking for Employment'
+			,@Headline nvarchar(50) = 'Open to New Opportunities'
+			,@Slug nvarchar(50) = 'U03ANH4GMUP'
+			,@StatusId int = 123654
+			,@TypeId int = 123680
+			,@PrimaryImageUrl nvarchar(50) = 'https://tinyurl.com/2p88nws5'
+			,@UserId int = 19481230
+
+	Execute dbo.Friends_InsertV2
+			@Title 
+			,@Bio
+			,@Summary
+			,@Headline 
+			,@Slug 
+			,@StatusId 
+			,@TypeId
+			,@PrimaryImageUrl
+			,@UserId
+			,@Id OUTPUT
+
+		Select *
+		From dbo.FriendsV2
+		WHERE Id = @Id
+
+*/ ----- END TEST CODE -----
+
+BEGIN
+
+DECLARE @ImageId int
+
+	INSERT INTO [dbo].[Images]
+			([TypeId]
+			,[Url])
+
+	VALUES (@TypeId
+			,@PrimaryImageUrl)
+
+SET @ImageId = SCOPE_IDENTITY()
+
+	INSERT INTO [dbo].[FriendsV2]
+           ([Title]
+           ,[Bio]
+           ,[Summary]
+           ,[Headline]
+           ,[Slug]
+           ,[StatusId]
+           ,[PrimaryImageId]
+           ,[UserId])
+     VALUES
+           (@Title 
+			,@Bio
+			,@Summary
+			,@Headline 
+			,@Slug 
+			,@StatusId 
+			,@ImageId 
+			,@UserId)
+
+	SET @Id = SCOPE_IDENTITY()
+
+END
