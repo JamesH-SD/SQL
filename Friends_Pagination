@@ -1,0 +1,54 @@
+USE [C117_sehguhbj_gmail]
+GO
+/****** Object:  StoredProcedure [dbo].[Friends_PaginationV2]    Script Date: 8/12/2022 12:10:19 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER   PROC [dbo].[Friends_PaginationV2]
+				@PageIndex int 
+				,@PageSize int 
+
+AS
+
+/* ----- TEST CODE -----
+
+	DECLARE @PageIndex int = 0
+			,@PageSize int = 10
+
+	Execute dbo.Friends_PaginationV2
+			@PageIndex 
+			,@PageSize 
+
+
+*/ ----- END TEST CODE -----
+
+
+BEGIN
+
+	Declare @offset int = @PageIndex * @PageSize
+
+	SELECT	fv.[Id]
+		 ,[Title]
+		 ,[Bio]
+		 ,[Summary]
+		 ,[Headline]
+		 ,[Slug]
+		 ,[StatusId]
+		 ,fv.[PrimaryImageId]
+		 ,i.[TypeId]
+		 ,i.[Url]
+		 ,[UserId]
+		,fv.[DateCreated]
+		 ,fv.[DateModified]
+
+				, TotalCount = COUNT(1) OVER() -- this the quick way of doing the count. (see below)
+        FROM    dbo.FriendsV2 as fv inner join dbo.Images as i
+			ON fv.PrimaryImageId = i.Id
+
+        ORDER BY fv.Id
+
+	OFFSET @offSet Rows
+	Fetch Next @PageSize Rows ONLY
+
+END
