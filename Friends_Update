@@ -1,0 +1,73 @@
+USE [C117_sehguhbj_gmail]
+GO
+/****** Object:  StoredProcedure [dbo].[Friends_UpdateV2]    Script Date: 8/12/2022 12:13:07 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER     PROC [dbo].[Friends_UpdateV2]
+			@Id int 
+			,@Title nvarchar(50)
+			,@Bio nvarchar(50)
+			,@Summary nvarchar(50)
+			,@Headline nvarchar(50)
+			,@Slug nvarchar(50)
+			,@StatusId int
+			,@TypeId int
+			,@PrimaryImageUrl nvarchar(50)
+			,@UserId int
+			
+AS
+
+/* ----- TEST CODE -----
+
+	DECLARE @Id int = 2
+
+	DECLARE @Title nvarchar(50) = 'Meli Hughes'
+			,@Bio nvarchar(50) = 'Student'
+			,@Summary nvarchar(50) = 'Full Time Student'
+			,@Headline nvarchar(50) = 'Found a Career Path'
+			,@Slug nvarchar(50) = 'U03ANH4GMUP'
+			,@StatusId int= '987412365'
+			,@TypeId int = 123680
+			,@PrimaryImageUrl nvarchar(50) = 'https://tinyurl.com/ycksctem'
+			,@UserId int = '19760828'
+
+	Execute dbo.Friends_UpdateV2 @Id 
+							,@Title
+							,@Bio
+							,@Summary
+							,@Headline
+							,@Slug
+							,@StatusId
+							,@TypeId
+							,@PrimaryImageUrl
+							,@UserId
+
+			DECLARE @datNow datetime2 = getutcdate() <<----- Is this needed?
+
+*/ ----- END TEST CODE -----
+
+BEGIN
+
+Declare @PrimaryImageId int = (SELECT PrimaryImageId FROM [dbo].[FriendsV2] WHERE Id = @Id)
+
+
+		UPDATE [dbo].[Images]
+			SET	[TypeId]  = @TypeId
+				,[Url] = @PrimaryImageUrl
+
+		WHERE Id = @PrimaryImageId
+
+		UPDATE [dbo].[FriendsV2]
+		SET	[Title] = @Title
+			,[Bio] = @Bio
+			,[Summary] = @Summary
+			,[Headline] = @Headline
+			,[Slug] = @Slug
+			,[StatusId] = @StatusId
+			,[PrimaryImageId] = @PrimaryImageId
+			,[UserId] = @UserId
+
+	WHERE Id = @Id
+END
