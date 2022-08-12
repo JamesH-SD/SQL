@@ -1,0 +1,61 @@
+USE [C117_sehguhbj_gmail]
+GO
+/****** Object:  StoredProcedure [dbo].[Friends_Search_PaginationV3]    Script Date: 8/12/2022 12:12:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ALTER     PROC [dbo].[Friends_Search_PaginationV3]
+			@PageIndex int
+			,@PageSize int
+			,@Query nvarchar(100)
+
+AS
+
+/* ----- TEST CODE -----
+	DECLARE @PageIndex int = 0;
+	DECLARE @PageSize int = 10;
+	DECLARE @Query nvarchar(100) = 'James Hughes'
+	
+	Execute dbo.Friends_Search_PaginationV3
+			@PageIndex
+			,@PageSize
+			,@Query
+
+*/ ----- END TEST CODE -----
+
+BEGIN
+
+	Declare @offset int = @PageIndex * @PageSize
+
+	SELECT	fv.[Id]
+		 ,fv.[Title]
+		 ,fv.[Bio]
+		 ,fv.[Summary]
+		 ,fv.[Headline]
+		 ,fv.[Slug]
+		 ,fv.[StatusId]
+		 ,fv.[PrimaryImageId]
+		 ,i.[TypeId]
+		 ,i.[Url]
+		 ,[UserId]
+		 ,Skills = (
+					Select s.[Name]
+					FROM Skills as s inner join dbo.FriendSkills as fs
+					on s.Id = fs.SkillId
+
+					WHERE fv.Id = fs.FriendId
+					FOR JSON AUTO
+			)
+			,TotalCount = COUNT(1) OVER()
+
+		FROM [dbo].[FriendsV2] as fv inner join dbo.Images as i
+			ON fv.PrimaryImageId = i.Id
+
+		WHERE (Title LIKE '%' + @Query + '%')
+
+		ORDER BY fv.Id
+		OFFSET @offSet Rows
+		Fetch Next @PageSize Rows ONLY
+
+END
