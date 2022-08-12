@@ -1,0 +1,64 @@
+USE [CnmPro]
+GO
+/****** Object:  StoredProcedure [dbo].[Files_Select_ByCreatedBy]    Script Date: 8/12/2022 12:00:21 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author: <James Hughes>
+-- Create date: <06/30/2022>
+-- Description: <Files_Select_ByCreatedBy>
+-- Code Reviewer:
+
+-- MODIFIED BY: author
+-- MODIFIED DATE:12/1/2020
+-- Code Reviewer: Brandon Peace
+-- Note:
+-- =============================================
+
+ALTER   PROC [dbo].[Files_Select_ByCreatedBy] 
+						@PageIndex int
+						,@PageSize int
+						,@CreatedBy int
+as
+
+/* ----- TEST CODE -----
+
+	Declare		@PageIndex int = 0
+				,@PageSize int = 10
+				,@CreatedBy int = 1
+	
+
+	Execute [dbo].[Files_Select_ByCreatedBy] 
+				@PageIndex
+				,@PageSize
+				,@CreatedBy
+
+	Execute [dbo].[Files_Select_ById] @CreatedBy
+
+*/ ----- END TEST CODE -----
+
+BEGIN
+
+Declare	   @offset int = @PageIndex * @PageSize
+
+	SELECT f.[Id]
+			,f.[Url]
+			,ft.[Name]
+			,u.[Id] as UserId
+			,TotalCount = COUNT(1) OVER()
+
+	FROM [dbo].[Files] as f inner join dbo.FileTypes as ft
+						on ft.Id = f.FileTypeId 
+						inner join dbo.Users as u
+						on u.Id = f.CreatedBy
+
+WHERE		f.Id = @CreatedBy
+ORDER BY	f.Id
+			OFFSET @offset ROWS
+FETCH NEXT  @PageSize ROWS ONLY
+
+
+END
