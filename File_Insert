@@ -1,0 +1,69 @@
+USE [CnmPro]
+GO
+/****** Object:  StoredProcedure [dbo].[Files_Insert]    Script Date: 8/12/2022 11:56:36 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author: <James Hughes>
+-- Create date: <06/30/2022>
+-- Description: <Files_Insert>
+-- Code Reviewer:
+
+-- MODIFIED BY: author
+-- MODIFIED DATE:12/1/2020
+-- Code Reviewer:
+-- Note:
+-- =============================================
+
+
+ALTER   PROC [dbo].[Files_Insert]
+			@Name nvarchar (80)
+			,@Url nvarchar (255) 
+			,@FileType nvarchar(50) 
+			,@CreatedBy int
+			,@Id int OUTPUT
+
+AS
+
+/* --Test Code
+Declare @Id int = 0;
+
+Declare		@Name nvarchar (80) = 'Test10'
+			,@Url nvarchar (255) = 'www.evertek1.com'
+			,@FileType nvarchar(50) = '.pdf'
+			,@CreatedBy int = 4
+
+
+Execute [dbo].[Files_Insert] 
+			@Name
+			,@Url
+			,@FileType
+			,@CreatedBy
+			,@Id OUTPUT
+
+Execute [dbo].[Files_Select_ById] @Id
+
+--*/
+
+BEGIN
+
+	Declare		@FileTypeId int 
+
+	SET			@FileTypeId = (SELECT Id FROM [dbo].[FileTypes] WHERE Name = @FileType)
+
+	INSERT INTO [dbo].[Files]
+				([Name]
+				,[Url]
+				,[FileTypeId]
+				,[CreatedBy])
+
+	VALUES		(@Name
+				,@Url
+				,@FileTypeId
+				,@CreatedBy)
+
+	SET @Id = SCOPE_IDENTITY();
+
+END
