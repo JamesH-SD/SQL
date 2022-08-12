@@ -1,0 +1,65 @@
+USE [CnmPro]
+GO
+/****** Object:  StoredProcedure [dbo].[Files_Select_ByFileTypeId_Paginated]    Script Date: 8/12/2022 12:01:15 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+-- =============================================
+-- Author: <Daniel Cazarez>
+-- Create date: <07/28/2022>
+-- Description: <Files_Select_ByFileTypeId_Paginated>
+-- Code Reviewer: Lucas Gil Montoya
+
+-- MODIFIED BY: N/A
+-- MODIFIED DATE: N/A
+-- Code Reviewer: N/A
+-- Note:
+-- =============================================
+
+ALTER   PROC [dbo].[Files_Select_ByFileTypeId_Paginated] 
+			@PageIndex int
+			,@PageSize int
+			,@TypeId int
+as
+
+/* ----- TEST CODE -----
+
+	DECLARE	@PageIndex int = 0
+			,@PageSize int = 50
+			,@TypeId int = 2
+	
+
+	EXECUTE [dbo].[Files_Select_ByFileTypeId_Paginated] 
+			@PageIndex
+			,@PageSize
+			,@TypeId
+
+*/ ----- END TEST CODE -----
+
+BEGIN
+
+	DECLARE	   @offset int = @PageIndex * @PageSize
+
+	SELECT f.[Id]
+			,f.[Name]
+			,f.[Url]
+			,f.[IsDeleted]
+			,ft.[Id] as FileTypeId
+			,ft.[Name]
+			,u.[Id] as UserId
+			,TotalCount = COUNT(1) OVER()
+
+	FROM [dbo].[Files] as f inner join dbo.FileTypes as ft
+						on ft.Id = f.FileTypeId 
+						inner join dbo.Users as u
+						on u.Id = f.CreatedBy
+
+WHERE		ft.Id = @TypeId and IsDeleted = 0
+ORDER BY	f.Id
+			OFFSET @offset ROWS
+FETCH NEXT  @PageSize ROWS ONLY
+
+END
