@@ -1,0 +1,48 @@
+USE [CnmPro]
+GO
+/****** Object:  StoredProcedure [dbo].[Files_Select_ById]    Script Date: 8/12/2022 12:02:20 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author: <James Hughes>
+-- Create date: <06/30/2022>
+-- Description: <Files_Select_ById>
+-- Code Reviewer:
+
+-- MODIFIED BY: author
+-- MODIFIED DATE:12/1/2020
+-- Code Reviewer: Brandon Peace
+-- Note:
+-- =============================================
+
+ALTER   PROC [dbo].[Files_Select_ById] 
+	@Id int 
+	
+as
+
+/* ----- TEST CODE -----
+
+	Declare @Id int = 21;
+
+	Execute [dbo].[Files_Select_ById] @Id
+
+*/ ----- END TEST CODE -----
+
+BEGIN
+
+	SELECT f.[Name],
+			f.[Id]
+			,f.[Url]
+			,ft.[Name] as FileType
+			,u.[Id] as CreatedBy
+
+	FROM [dbo].[Files] as f inner join dbo.FileTypes as ft
+						on ft.Id = f.FileTypeId 
+						inner join dbo.Users as u
+						on u.Id = f.CreatedBy
+
+			Where @Id = f.Id
+END
