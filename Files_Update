@@ -1,0 +1,61 @@
+USE [CnmPro]
+GO
+/****** Object:  StoredProcedure [dbo].[Files_Update]    Script Date: 8/12/2022 12:04:33 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+ -- =============================================
+-- Author: <James Hughes>
+-- Create date: <06/30/2022>
+-- Description: <Files_SelectAll>
+-- Code Reviewer:
+
+-- MODIFIED BY: author
+-- MODIFIED DATE:12/1/2020
+-- Code Reviewer: Brandon Peace
+-- Note:
+-- =============================================
+
+ALTER   PROC [dbo].[Files_Update]
+			@Url nvarchar (255) 
+			,@FileType nvarchar(50) 
+			,@CreatedBy int
+			,@Id int 
+
+AS
+
+/* --Test Code
+
+Declare		@Id int = 3
+
+Declare		@Url nvarchar (255) = 'www.Apple.com'
+			,@FileType nvarchar(100) = '.pdf'
+			,@CreatedBy int = 4
+
+Execute [dbo].[Files_Update]
+			@Url
+			,@FileType
+			,@CreatedBy
+			,@Id
+
+			Select *
+			From [dbo].[Files]
+			WHERE Id = @Id
+
+Execute [dbo].[Files_Select_ById] @Id
+--*/
+
+BEGIN
+
+	Declare	@FileTypeId int 
+
+		SET @FileTypeId = (SELECT Id FROM [dbo].[FileTypes] WHERE Name = @FileType)
+
+	UPDATE	[dbo].[Files]
+		SET	[Url] = @Url
+			,[FileTypeId] = @FileTypeId
+			,[CreatedBy] = @CreatedBy
+	WHERE Id = @Id
+
+END
